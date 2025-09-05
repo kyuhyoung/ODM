@@ -1,17 +1,17 @@
 #!/bin/bash
 
 # OpenSFM COLMAP Export Script
-# Usage: ./export_colmap.sh <opensfm_dataset_directory> [--binary]
+# Usage: ./export_colmap.sh
 
-# Check if directory argument is provided
-if [ $# -lt 1 ]; then
-    echo "Usage: $0 <opensfm_dataset_directory> [--binary]"
-    echo "Example: $0 /path/to/opensfm_dataset"
-    echo "Example: $0 /path/to/opensfm_dataset --binary"
-    exit 1
-fi
+# 직접 설정할 경로와 옵션들
+:<<END
+DIR_OSFM="/mnt/hdd_16tb/datas/sillim_ew/opensfm"
+USE_BINARY=true  # true면 바이너리, false면 텍스트
+END
 
-DIR_OSFM="$1"
+DIR_OSFM="/data/sillim_ew_copied/opensfm"
+USE_BINARY=false  # true면 바이너리, false면 텍스트
+
 OPENSFM_BIN="./SuperBuild/install/bin/opensfm/bin/opensfm"
 
 # Check if OpenSFM binary exists
@@ -30,7 +30,7 @@ fi
 echo "Exporting OpenSFM dataset to COLMAP format..."
 echo "Input directory: $DIR_OSFM"
 
-if [ "$2" = "--binary" ]; then
+if [ "$USE_BINARY" = true ]; then
     echo "Output format: Binary"
     "$OPENSFM_BIN" export_colmap "$DIR_OSFM" --binary
 else
