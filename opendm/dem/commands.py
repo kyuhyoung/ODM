@@ -87,6 +87,7 @@ def create_dem(input_point_cloud, dem_type, output_type='max', radiuses=['0.56']
         'classification': 2 if dem_type == 'dtm' else -1,
         'tileSize': max_tile_size
     }
+    #print('renderdem start');   exit()
     system.run('renderdem "{input}" '
                 '--outdir "{outdir}" '
                 '--output-type {outputType} '
@@ -168,6 +169,7 @@ def create_dem(input_point_cloud, dem_type, output_type='max', radiuses=['0.56']
         # Merge filled scaled DEM with unfilled DEM using bilinear interpolation
         run('gdalbuildvrt -resolution highest -r bilinear "%s" "%s" "%s"' % (merged_vrt_path, geotiff_small_filled_path, tiles_vrt_path))
         run('gdal_translate '
+            #'--degug ON '
             '-co NUM_THREADS={threads} '
             '-co TILED=YES '
             '-co BIGTIFF=IF_SAFER '

@@ -21,7 +21,7 @@ def create_25dmesh(inPointCloud, outMesh, radius_steps=["0.05"], dsm_resolution=
     log.ODM_INFO('Created temporary directory: %s' % tmp_directory)
 
     log.ODM_INFO('Creating DSM for 2.5D mesh')
-
+    #print('1111')
     commands.create_dem(
             inPointCloud,
             'mesh_dsm',

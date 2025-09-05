@@ -63,8 +63,10 @@ class ODMDEMStage(types.ODM_Stage):
                 if args.dtm: products.append('dtm')
 
                 radius_steps = commands.get_dem_radius_steps(tree.filtered_point_cloud_stats, args.dem_gapfill_steps, resolution)
-
+                #print(f'len(products) : {len(products)}');  exit() # 2
+                #print(f'products : {products}');  exit() # 2
                 for product in products:
+                    print('product')
                     commands.create_dem(
                             dem_input,
                             product,

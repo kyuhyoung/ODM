@@ -44,11 +44,17 @@ def load_images_database(database_file):
 
     return result
 
+
+def get_exact_file_name_from_path(str_path):
+    return os.path.splitext(os.path.basename(str_path))[0]
+
 class ODMLoadDatasetStage(types.ODM_Stage):
     def process(self, args, outputs):
         outputs['start_time'] = system.now_raw()
         tree = types.ODM_Tree(args.project_path, args.gcp, args.geo, args.align)
+        #print(f'tree : {tree}');    exit()  
         outputs['tree'] = tree
+        #print(f'tree.benchmarking : {tree.benchmarking}');    exit()  
 
         if io.file_exists(tree.benchmarking):
             # Delete the previously made file
@@ -61,6 +67,7 @@ class ODMLoadDatasetStage(types.ODM_Stage):
 
         def valid_filename(filename, supported_extensions):
             (pathfn, ext) = os.path.splitext(filename)
+            #print(f'filename : {filename}');    exit()
             return ext.lower() in supported_extensions and pathfn[-5:] != "_mask"
 
         # Get supported images from dir
@@ -94,6 +101,7 @@ class ODMLoadDatasetStage(types.ODM_Stage):
 
         # get images directory
         images_dir = tree.dataset_raw
+        xmls_dir = tree.dir_xml
 
         # define paths and create working directories
         system.mkdir_p(tree.odm_georeferencing)
@@ -164,11 +172,18 @@ class ODMLoadDatasetStage(types.ODM_Stage):
                         masks[p] = r
                     
                 photos = []
+                #print(f'tree.dataset_list : {tree.dataset_list}');  exit()
                 with open(tree.dataset_list, 'w') as dataset_list:
                     log.ODM_INFO("Loading %s images" % len(path_files))
                     for f in path_files:
                         try:
-                            p = types.ODM_Photo(f)
+                            #print(f'f : {f}');  exit()
+                            if xmls_dir:
+                                fn_only = get_exact_file_name_from_path(f)
+                                path_xml = os.path.join(xmls_dir, fn_only + '.xml')
+                            else:
+                                path_xml = None
+                            p = types.ODM_Photo(f, path_xml)
                             p.set_mask(find_mask(f, masks))
                             photos.append(p)
                             dataset_list.write(photos[-1].filename + '\n')
@@ -296,13 +311,13 @@ class ODMLoadDatasetStage(types.ODM_Stage):
         else:
             # We have an images database, just load it
             photos = load_images_database(images_database_file)
-
+        #print(f'type(photos) : {type(photos)}');  exit()
         log.ODM_INFO('Found %s usable images' % len(photos))
         log.logger.log_json_images(len(photos))
 
         # Create reconstruction object
         reconstruction = types.ODM_Reconstruction(photos)
-        
+        #print(f'tree.odm_georeferencing_gcp : {tree.odm_georeferencing_gcp}');  exit()
         if tree.odm_georeferencing_gcp and not args.use_exif:
             reconstruction.georeference_with_gcp(tree.odm_georeferencing_gcp,
                                                  tree.odm_georeferencing_coords,
@@ -310,6 +325,8 @@ class ODMLoadDatasetStage(types.ODM_Stage):
                                                  tree.odm_georeferencing_model_txt_geo,
                                                  rerun=self.rerun())
         else:
+
+            #print(f'aaa');  exit()
             reconstruction.georeference_with_gps(tree.dataset_raw, 
                                                  tree.odm_georeferencing_coords, 
                                                  tree.odm_georeferencing_model_txt_geo,

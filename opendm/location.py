@@ -12,6 +12,7 @@ def extract_utm_coords(photos, images_path, output_coords_file):
     :param output_coords_file (str) path to output coordinates file
     :return None
     """
+    #while True: print(f'3333 len(photos) : {len(photos)}')
     if len(photos) == 0:
         raise Exception("No input images, cannot create coordinates file of GPS positions")
     
@@ -19,9 +20,11 @@ def extract_utm_coords(photos, images_path, output_coords_file):
     hemisphere = None
     coords = []
     reference_photo = None
+    n_skip = 0
     for photo in photos:
         if photo.latitude is None or photo.longitude is None:
             log.ODM_WARNING("GPS position not available for %s" % photo.filename)
+            n_skip += 1
             continue
         
         if utm_zone is None:
@@ -35,6 +38,7 @@ def extract_utm_coords(photos, images_path, output_coords_file):
         
         coords.append(coord)
 
+    #while True: print(f'n_skip : {n_skip} / {len(photos)}')
     if utm_zone is None:
         raise Exception("No images seem to have GPS information")
         

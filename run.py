@@ -28,7 +28,6 @@ if __name__ == '__main__':
     args = config.config()
 
     log.ODM_INFO('Initializing ODM %s - %s' % (odm_version(), system.now()))
-
     progressbc.set_project_name(args.name)
     args.project_path = os.path.join(args.project_path, args.name)
 
@@ -38,6 +37,7 @@ if __name__ == '__main__':
 
     opts_json = os.path.join(args.project_path, "options.json")
     auto_rerun_stage, opts_diff = find_rerun_stage(opts_json, args, config.rerun_stages, config.processopts)
+    #print(f'auto_rerun_stage : {auto_rerun_stage}');    exit()
     if auto_rerun_stage is not None and len(auto_rerun_stage) > 0:
         log.ODM_INFO("Rerunning from: %s" % auto_rerun_stage[0])
         args.rerun_from = auto_rerun_stage
@@ -51,6 +51,7 @@ if __name__ == '__main__':
     
 
     # If user asks to rerun everything, delete all of the existing progress directories.
+    #print(f'args.rerun_all : {args.rerun_all}');    exit()
     if args.rerun_all:
         log.ODM_INFO("Rerun all -- Removing old data")
         for d in [os.path.join(args.project_path, p) for p in get_processing_results_paths()] + [

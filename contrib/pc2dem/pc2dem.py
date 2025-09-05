@@ -43,6 +43,7 @@ radius_steps = [args.resolution / 2.0]
 for _ in range(args.gapfill_steps - 1):
     radius_steps.append(radius_steps[-1] * 2) # 2 is arbitrary, maybe there's a better value?
 
+#print('2222')
 commands.create_dem(args.point_cloud,
                     args.type,
                     output_type='idw' if args.type == 'dtm' else 'max',

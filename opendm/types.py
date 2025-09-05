@@ -24,10 +24,12 @@ warnings.filterwarnings("ignore")
 class ODM_Reconstruction(object):
     def __init__(self, photos):
         self.photos = photos
+        #print(f'b4 len(self.photos) : {len(self.photos)}');  #exit()
         self.georef = None
         self.gcp = None
         self.multi_camera = self.detect_multi_camera()
         self.filter_photos()
+        #print(f'after len(self.photos) : {len(self.photos)}');  exit()
         
     def detect_multi_camera(self):
         """
@@ -36,7 +38,7 @@ class ODM_Reconstruction(object):
         """
         band_photos = {}
         band_indexes = {}
-
+        #print(f'1111 len(self.photos : {len(self.photos)}')
         for p in self.photos:
             if not p.band_name in band_photos:
                 band_photos[p.band_name] = []
@@ -130,6 +132,7 @@ class ODM_Reconstruction(object):
             
             return mc
 
+        #print(f'2222 len(self.photos : {len(self.photos)}');  exit()
         return None
 
     def filter_photos(self):
@@ -178,6 +181,8 @@ class ODM_Reconstruction(object):
         return self.is_georeferenced() and self.gcp is not None and self.gcp.exists()
     
     def has_geotagged_photos(self):
+
+        #while True: print(f'bbb')
         for photo in self.photos:
             if photo.latitude is None and photo.longitude is None:
                 return False
@@ -185,6 +190,8 @@ class ODM_Reconstruction(object):
         return True 
 
     def georeference_with_gcp(self, gcp_file, output_coords_file, output_gcp_file, output_model_txt_geo, rerun=False):
+        
+        #while True: print(f'ccc')
         if not io.file_exists(output_coords_file) or not io.file_exists(output_gcp_file) or rerun:
             gcp = GCPFile(gcp_file)
             if gcp.exists():
@@ -240,8 +247,14 @@ class ODM_Reconstruction(object):
         return self.georef
 
     def georeference_with_gps(self, images_path, output_coords_file, output_model_txt_geo, rerun=False):
+
+        #while True: print(f'ddd')
         try:
+            #while True:
+            #    print(f'io.file_exists(output_coords_file) : {io.file_exists(output_coords_file)}, rerun : {rerun}'); 
+            
             if not io.file_exists(output_coords_file) or rerun:
+                #while True: print(f'2222 len(self.photos) : {len(self.photos)}')
                 location.extract_utm_coords(self.photos, images_path, output_coords_file)
             else:
                 log.ODM_INFO("Coordinates file already exist: %s" % output_coords_file)
@@ -281,6 +294,8 @@ class ODM_Reconstruction(object):
             return (None, None)
 
     def get_photo(self, filename):
+
+        while True: print(f'eee')
         for p in self.photos:
             if p.filename == filename:
                 return p
@@ -333,6 +348,7 @@ class ODM_Tree(object):
         # here are defined where all modules should be located in
         # order to keep track all files al directories during the
         # whole reconstruction process.
+        self.dir_xml = os.path.join(self.root_path, 'xmls')
         self.dataset_raw = os.path.join(self.root_path, 'images')
         self.opensfm = os.path.join(self.root_path, 'opensfm')
         self.openmvs = os.path.join(self.opensfm, 'undistorted', 'openmvs')
@@ -443,11 +459,11 @@ class ODM_Stage:
     def run(self, outputs = {}):
         start_time = system.now_raw()
         log.logger.log_json_stage_run(self.name, start_time)
-
+        #print(f'self.args : {self.args}, self.name : {self.name}');  exit()
         log.ODM_INFO('Running %s stage' % self.name)
         
         self.process(self.args, outputs)
-
+        #exit()
         # The tree variable should always be populated at this point
         if outputs.get('tree') is None:
             raise Exception("Assert violation: tree variable is missing from outputs dictionary.")

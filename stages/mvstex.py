@@ -64,12 +64,17 @@ class ODMMvsTexStage(types.ODM_Stage):
         
         progress_per_run = 100.0 / len(nonloc.runs)
         progress = 0.0
-
+        '''
+        print(f'len(nonloc.runs) : {len(nonloc.runs)}');  #exit()
+        print(f'nonloc.runs[0] : {nonloc.runs[0]}');  #exit()
+        print(f'nonloc.runs[1] : {nonloc.runs[1]}');  #exit()
+        '''
         for r in nonloc.runs:
             if not io.dir_exists(r['out_dir']):
                 system.mkdir_p(r['out_dir'])
 
             odm_textured_model_obj = os.path.join(r['out_dir'], tree.odm_textured_model_obj)
+            #print(f'odm_textured_model_obj : {odm_textured_model_obj}');   exit()
             unaligned_obj = io.related_file_path(odm_textured_model_obj, postfix="_unaligned")
 
             if not io.file_exists(odm_textured_model_obj) or self.rerun():

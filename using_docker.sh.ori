@@ -1,0 +1,2 @@
+#docker run -ti --rm -v c:/Users/youruser/datasets:/datasets --gpus all opendronemap/odm:gpu --project-path /datasets project
+docker run -ti --rm -v /mnt/hdd_16tb/dataset_stereo:/datasets --gpus all opendronemap/odm:gpu --project-path /datasets odm_boruszyn_kap

@@ -18,6 +18,7 @@ from opendm import get_image_size
 from xml.parsers.expat import ExpatError
 from opensfm.sensors import sensor_data
 from opensfm.geo import ecef_from_lla
+import xml.etree.ElementTree as ET
 
 projections = ['perspective', 'fisheye', 'fisheye_opencv', 'brown', 'dual', 'equirectangular', 'spherical']
 
@@ -101,7 +102,7 @@ class GPSRefMock:
 class ODM_Photo:
     """ODMPhoto - a class for ODMPhotos"""
 
-    def __init__(self, path_file):
+    def __init__(self, path_file, path_xml = None):
         self.filename = os.path.basename(path_file)
         self.mask = None
         
@@ -176,6 +177,9 @@ class ODM_Photo:
 
         # parse values from metadata
         self.parse_exif_values(path_file)
+        if path_xml:
+            if os.path.exists(path_xml):
+                self.parse_xml_values(path_xml)
 
     def __str__(self):
         return '{} | camera: {} {} | dimensions: {} x {} | lat: {} | lon: {} | alt: {} | band: {} ({})'.format(
@@ -199,8 +203,55 @@ class ODM_Photo:
         self.gps_xy_stddev = geo_entry.horizontal_accuracy
         self.gps_z_stddev = geo_entry.vertical_accuracy
 
+    def parse_xml_values(self, xml_file):
+       
+        # Parse the XML file
+        tree = ET.parse(xml_file)
+        root = tree.getroot()
+        # Extract Omega, Phi, and Kappa values
+        self.omega = float(root.find('.//Omega').text)
+        self.phi = float(root.find('.//Phi').text)
+        self.kappa = float(root.find('.//Kappa').text)
+
+
+    def parse_ImageDescription(self, metadata):
+        # Regular expressions to extract values
+        #print(f'type(metadata.values) : {type(metadata.values)}');    exit()
+        latitude_match = re.search(r"GPS_LATITUDE:\s*([\w\d\.\-]+)", metadata)
+        longitude_match = re.search(r"GPS_LONGITUDE:\s*([\w\d\.\-]+)", metadata)
+        
+        altitude_match = re.search(r"GPS_ABOVE_GROUND_LEVEL:\s*([\w\d\.\-]+)", metadata)
+        if not altitude_match:
+            altitude_match = re.search(r"GPS_ALTITUDE:\s*([\w\d\.\-]+)", metadata)
+        principal_distance_match = re.search(r"PRINCIPAL_DISTANCE:\s*([\w\d\.\-]+)", metadata)
+
+        # Extract values as strings
+        gps_latitude = latitude_match.group(1) if latitude_match else None
+        gps_longitude = longitude_match.group(1) if longitude_match else None
+        gps_altitude = altitude_match.group(1) if altitude_match else None
+        principal_distance = principal_distance_match.group(1) if principal_distance_match else None
+        if gps_altitude is not None:
+            self.altitude = float(gps_altitude)
+        if gps_latitude is not None:
+            self.latitude = float(gps_latitude[1:])
+            ref_lat = gps_latitude[0]
+            if ref_lat in 'Ss':
+                self.latitude *= -1
+        if gps_longitude is not None:           
+            self.longitude = float(gps_longitude[1:])
+            ref_lon = gps_longitude[0]
+            if ref_lon in 'Ww':
+                self.longitude *= -1
+        
+        print(f'self.latitude : {self.latitude}, self.longitude : {self.longitude}, self.altitude : {self.altitude}, principal_distance : {principal_distance}');   #exit()
+        return
+
+
+
+        
     def parse_exif_values(self, _path_file):
         # Disable exifread log
+        #print(f'_path_file : {_path_file}');    exit()
         logging.getLogger('exifread').setLevel(logging.CRITICAL)
 
         try:
@@ -213,7 +264,11 @@ class ODM_Photo:
 
         with open(_path_file, 'rb') as f:
             tags = exifread.process_file(f, details=True, extract_thumbnail=False)
+            #print(f'tags : {tags}');    exit()
             try:
+                if 'Image ImageDescription'in tags:
+                    self.parse_ImageDescription(tags['Image ImageDescription'].values)
+
                 if 'Image Make' in tags:
                     try:
                         self.camera_make = tags['Image Make'].values

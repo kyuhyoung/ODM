@@ -892,6 +892,8 @@ def config(argv=None, parser=None):
                           'Default: %(default)s'))
 
     args, unknown = parser.parse_known_args(argv)
+    #print(f'args : {args}');    print(f'unknown : {unknown}');  exit()
+    #print(f'args.use_exif : {args.use_exif}'); exit()
     DEPRECATED = ["--verbose", "--debug", "--time", "--resize-to", "--depthmap-resolution", "--pc-geometric", "--texturing-data-term", "--texturing-outlier-removal-type", "--texturing-tone-mapping", "--texturing-skip-local-seam-leveling"]
     unknown_e = [p for p in unknown if p not in DEPRECATED]
     if len(unknown_e) > 0:

@@ -80,6 +80,7 @@ class ODMApp:
     def execute(self):
         try:
             self.first_stage.run()
+            #print('aaa');   exit()
             log.logger.log_json_success()
             return 0
         except system.SubprocessException as e:

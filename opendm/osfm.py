@@ -263,6 +263,8 @@ class OSFMContext:
                 "align_orientation_prior: vertical",
                 "triangulation_type: ROBUST",
                 "retriangulation_ratio: 2",
+                "robust_matching_min_match : 100",
+                "bundle_max_iterations : 999"
             ]
             
             if args.matcher_order > 0:
@@ -392,6 +394,7 @@ class OSFMContext:
             with open(os.path.join(metadata_dir, "%s.exif" % p.filename), 'w') as f:
                 f.write(json.dumps(d, indent=4))
 
+            #t1 = os.path.join(metadata_dir, "%s.exif" % p.filename);    print(f'{t1} is saved'); exit()
             camera_id = p.camera_id()
             if camera_id not in camera_models:
                 camera = exif.camera_from_exif_metadata(d, data)
